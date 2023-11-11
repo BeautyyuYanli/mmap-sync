@@ -13,7 +13,7 @@ At the core of `mmap-sync` is a `Synchronizer` structure that offers a simple in
 ```rust
 impl Synchronizer {
     /// Write a given `entity` into the next available memory mapped file.
-    pub fn write<T>(&mut self, entity: &T, grace_duration: Duration) -> Result<(usize, bool), SynchronizerError> {
+    pub fn write<T>(&mut self, entity: &T, grace_duration: Duration) -> Result<(usize, bool, InstanceVersion), SynchronizerError> {
         …
     }
 
@@ -72,7 +72,7 @@ To run these examples, follow these steps:
 Upon successful execution of these examples, the terminal output should resemble:
 ```shell
 # Writer example
-written: 36 bytes | reset: false
+written: 36 bytes | reset: false | ver: 3450706193100570696
 # Reader example
 version: 7 messages: ["Hello", "World", "!"]
 ```
