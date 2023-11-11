@@ -92,7 +92,7 @@ impl Synchronizer {
         &mut self,
         entity: &T,
         grace_duration: Duration,
-    ) -> Result<(usize, bool), SynchronizerError>
+    ) -> Result<(usize, bool, InstanceVersion), SynchronizerError>
     where
         T: Serialize<DefaultSerializer>,
         T::Archived: for<'b> CheckBytes<DefaultValidator<'b>>,
@@ -123,7 +123,7 @@ impl Synchronizer {
         // switch readers to new version
         state.switch_version(new_version);
 
-        Ok((size, reset))
+        Ok((size, reset, new_version))
     }
 
     /// Write raw data bytes representing type `T` into the next available data file.
@@ -289,7 +289,7 @@ mod tests {
 
         // check if can write entity with correct size
         let entity = entity_generator.gen(100);
-        let (size, reset) = writer.write(&entity, Duration::from_secs(1)).unwrap();
+        let (size, reset, _ver) = writer.write(&entity, Duration::from_secs(1)).unwrap();
         assert!(size > 0);
         assert_eq!(reset, false);
         assert!(Path::new(&state_path).exists());
@@ -307,7 +307,7 @@ mod tests {
 
         // check if can write entity again
         let entity = entity_generator.gen(200);
-        let (size, reset) = writer.write(&entity, Duration::from_secs(1)).unwrap();
+        let (size, reset, _ver) = writer.write(&entity, Duration::from_secs(1)).unwrap();
         assert!(size > 0);
         assert_eq!(reset, false);
         assert!(Path::new(&state_path).exists());
@@ -323,7 +323,7 @@ mod tests {
 
         // write entity twice to switch to the same `idx` without any reads in between
         let entity = entity_generator.gen(100);
-        let (size, reset) = writer.write(&entity, Duration::from_secs(1)).unwrap();
+        let (size, reset, _ver) = writer.write(&entity, Duration::from_secs(1)).unwrap();
         assert!(size > 0);
         assert_eq!(reset, false);
         assert_eq!(
@@ -332,7 +332,7 @@ mod tests {
         );
 
         let entity = entity_generator.gen(200);
-        let (size, reset) = writer.write(&entity, Duration::from_secs(1)).unwrap();
+        let (size, reset, _ver) = writer.write(&entity, Duration::from_secs(1)).unwrap();
         assert!(size > 0);
         assert_eq!(reset, false);
         assert_eq!(

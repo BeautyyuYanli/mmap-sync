@@ -15,10 +15,15 @@ fn main() {
     };
 
     // Write data to shared memory
-    let (written, reset) = synchronizer
+    let (written, reset, ver) = synchronizer
         .write(&data, Duration::from_secs(1))
         .expect("failed to write data");
 
     // Show how many bytes written and whether state was reset
-    println!("written: {} bytes | reset: {}", written, reset);
+    println!(
+        "written: {} bytes | reset: {} | ver: {}",
+        written,
+        reset,
+        u64::from(ver)
+    );
 }
